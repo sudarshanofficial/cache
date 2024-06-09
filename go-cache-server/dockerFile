@@ -1,0 +1,12 @@
+FROM golang:alpine
+
+RUN apk add --no-cache git
+
+WORKDIR /cache
+
+COPY . .
+
+
+RUN go build -o main .
+
+CMD ["./main"]
