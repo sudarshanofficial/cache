@@ -82,7 +82,7 @@ func (s *Server) DeleteCache(w http.ResponseWriter, r *http.Request) {
 
 	log.Printf("Deleting cache for key: %s", key+" "+mode)
 	if mode == "async" {
-		go s.asyncGetCache(key, w)
+		go s.asyncDeleteCache(key, w)
 		w.WriteHeader(http.StatusAccepted)
 
 	}
@@ -104,7 +104,7 @@ func (s *Server) DeleteCache(w http.ResponseWriter, r *http.Request) {
 	utils.RespondJSON(w, http.StatusOK, map[string]string{"status": "ok"})
 }
 
-func (s *Server) asyncGetCache(key string, w http.ResponseWriter) {
+func (s *Server) asyncDeleteCache(key string, w http.ResponseWriter) {
 
 	if err := s.redisCache.Delete(key); err != nil {
 		utils.LogError("Async: Error deleting Redis cache", err)
