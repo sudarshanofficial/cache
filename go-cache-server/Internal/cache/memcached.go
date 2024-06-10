@@ -1,8 +1,6 @@
 package cache
 
-import (
-	"github.com/bradfitz/gomemcache/memcache"
-)
+import "github.com/bradfitz/gomemcache/memcache"
 
 type MemcachedCache struct {
 	client *memcache.Client
@@ -23,6 +21,9 @@ func (m *MemcachedCache) Get(key string) (string, error) {
 }
 
 func (m *MemcachedCache) Set(key string, value string) error {
+	return m.client.Set(&memcache.Item{Key: key, Value: []byte(value), Expiration: m.ttl})
+}
+func (m *MemcachedCache) SetWithTTL(key string, value string, expiration int32) error {
 	return m.client.Set(&memcache.Item{Key: key, Value: []byte(value), Expiration: m.ttl})
 }
 

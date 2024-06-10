@@ -25,6 +25,9 @@ func (r *RedisCache) Get(key string) (string, error) {
 	return r.client.Get(context.Background(), key).Result()
 }
 
+func (r *RedisCache) SetWithTTL(key string, value string, expiration time.Duration) error {
+	return r.client.Set(context.Background(), key, value, expiration).Err()
+}
 func (r *RedisCache) Set(key string, value string) error {
 	return r.client.Set(context.Background(), key, value, r.ttl).Err()
 }

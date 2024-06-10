@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"go-cache-server/Internal/cache"
 	"go-cache-server/Internal/server"
+
 	"log"
 	"net/http"
 	"time"
@@ -24,7 +25,8 @@ func main() {
 
 	// Define routes using the Server methods as handlers
 	r.HandleFunc("/cache/{key}", srv.GetCache).Methods("GET")
-	r.HandleFunc("/cache/{key}", srv.SetCache).Methods("POST")
+	r.HandleFunc("/cache", srv.SetCache).Methods("POST")
+	r.HandleFunc("/cache/{key}/{ttl}", srv.SetCacheWithTTL).Methods("POST")
 	r.HandleFunc("/cache/{key}", srv.DeleteCache).Methods("DELETE")
 	r.HandleFunc("/cache/clear", srv.ClearAllCaches).Methods("PUT")
 
@@ -37,7 +39,7 @@ func main() {
 	log.Fatal(http.ListenAndServe(addr, router))
 }
 
-// Router is a custom type for mux.Router that can be used to add additional methods if needed
+// Router is a custom type for 	mux.Router that can be used to add additional methods if needed
 type Router struct {
 	*mux.Router
 }
