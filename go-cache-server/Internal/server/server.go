@@ -81,14 +81,8 @@ func (s *Server) DeleteCache(w http.ResponseWriter, r *http.Request) {
 	mode := r.URL.Query().Get("mode")
 
 	log.Printf("Deleting cache for key: %s", key+" "+mode)
-	if mode == "async" {
-		go s.asyncDeleteCache(key, w)
-		w.WriteHeader(http.StatusAccepted)
-
-	}
 	s.mu.Lock()
 	defer s.mu.Unlock()
-
 	if err := s.redisCache.Delete(key); err != nil {
 		utils.LogError("Error deleting Redis cache", err)
 		utils.RespondError(w, http.StatusInternalServerError, "Failed to delete Redis cache")
@@ -104,25 +98,27 @@ func (s *Server) DeleteCache(w http.ResponseWriter, r *http.Request) {
 	utils.RespondJSON(w, http.StatusOK, map[string]string{"status": "ok"})
 }
 
-func (s *Server) asyncDeleteCache(key string, w http.ResponseWriter) {
+// func (s *Server) asyncDeleteCache(key string, w http.ResponseWriter) {
 
-	if err := s.redisCache.Delete(key); err != nil {
-		utils.LogError("Async: Error deleting Redis cache", err)
-		utils.RespondError(w, http.StatusInternalServerError, "Failed to delete Redis cache")
-		return
-	}
-	if err := s.memcachedCache.Delete(key); err != nil {
-		utils.LogError("Async: Error deleting Memcached cache", err)
-		utils.RespondError(w, http.StatusInternalServerError, "Failed to delete Memcached cache")
-		return
-	}
-	utils.RespondJSON(w, http.StatusOK, map[string]string{"status": "ok"})
+// 	if err := s.redisCache.Delete(key); err != nil {
+// 		utils.LogError("Async: Error deleting Redis cache", err)
+// 		utils.RespondError(w, http.StatusInternalServerError, "Failed to delete Redis cache")
+// 		return
+// 	}
+// 	if err := s.memcachedCache.Delete(key); err != nil {
+// 		utils.LogError("Async: Error deleting Memcached cache", err)
+// 		utils.RespondError(w, http.StatusInternalServerError, "Failed to delete Memcached cache")
+// 		return
+// 	}
+// 	utils.RespondJSON(w, http.StatusOK, map[string]string{"status": "ok"})
 
-}
+// }
 
 func (s *Server) ClearAllCaches(w http.ResponseWriter, r *http.Request) {
 	log.Printf("Clearing all caches")
 
+	s.mu.Lock()
+	defer s.mu.Unlock()
 	if err := s.redisCache.Clear(); err != nil {
 		utils.LogError("Error clearing Redis cache", err)
 		utils.RespondError(w, http.StatusInternalServerError, "Failed to clear Redis cache")
