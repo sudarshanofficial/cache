@@ -1,0 +1,46 @@
+version: '3.8'
+
+networks:
+  caching_system:
+    driver: bridge
+
+services:
+  redis:
+    image: redis:latest
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis-data:/data
+    networks:
+      - caching_system
+    container_name: redis
+
+  memcached:
+    image: memcached:latest
+    ports:
+      - "11211:11211"
+    volumes:
+      - memcached-data:/data 
+    networks:
+      - caching_system
+    container_name: memcached
+      
+  go-service:
+    build:
+       context: .
+       dockerfile: Dockerfile
+    command: ["go", "run", "main.go"]
+    volumes:
+      - .:/app
+    ports:
+      - "8080:8080"
+    depends_on:
+      - redis
+      - memcached
+    networks:
+      - caching_system
+    container_name: go-service
+
+volumes :
+  redis-data:
+  memcached-data:
