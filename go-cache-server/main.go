@@ -13,8 +13,8 @@ import (
 
 func main() {
 	// Initialize caches
-	redisCache := cache.NewRedisCache("localhost:6379", "", 0, 1*time.Minute)
-	memcachedCache := cache.NewMemcachedCache("localhost:11211", 60)
+	redisCache := cache.NewRedisCache("redis:6379", "", 0, 1*time.Minute)
+	memcachedCache := cache.NewMemcachedCache("memcached:11211", 60)
 
 	// Initialize server with caches
 	srv := server.NewServer(redisCache, memcachedCache)
@@ -32,7 +32,7 @@ func main() {
 	router := Router{r}
 
 	// Start the HTTP server
-	addr := "127.0.0.1:8080"
+	addr := ":8080"
 	fmt.Printf("Server started at %s\n", addr)
 	log.Fatal(http.ListenAndServe(addr, router))
 }
